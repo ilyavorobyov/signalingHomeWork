@@ -7,6 +7,7 @@ public class Signaling : MonoBehaviour
     private float _volume = 0;
     private float _desiredVolume = 1;
     private float _volumeStep = 0.15f;
+    private bool _isThiefInside = false;
 
     private void Start()
     {
@@ -15,14 +16,18 @@ public class Signaling : MonoBehaviour
 
     private void Update()
     {
-        _audioSource.volume = _volume;
-        _volume = Mathf.MoveTowards(_volume, _desiredVolume, _volumeStep * Time.deltaTime);
+        if (_isThiefInside)
+        {
+            _audioSource.volume = _volume;
+            _volume = Mathf.MoveTowards(_volume, _desiredVolume, _volumeStep * Time.deltaTime);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.TryGetComponent<Thief>(out Thief thief))
         {
+            _isThiefInside = true;
             _desiredVolume = 1;
             _audioSource.Play();
         }
@@ -33,7 +38,12 @@ public class Signaling : MonoBehaviour
         if (collision.TryGetComponent<Thief>(out Thief thief))
         {
             _desiredVolume = 0;
-            _audioSource.Play();
+
+            if (_volume == 0)
+            {
+                _isThiefInside = false;
+                _audioSource.Stop();
+            }
         }
     }
 }
