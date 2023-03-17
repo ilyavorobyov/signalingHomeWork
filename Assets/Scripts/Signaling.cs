@@ -11,40 +11,33 @@ public class Signaling : MonoBehaviour
     private float _maxVolume = 1;
     private float _volumeStep = 0.4f;
     private EntrySensor[] _sensors;
-    private IEnumerator _volumeUp;
+/*    private IEnumerator _volumeUp;
     private IEnumerator _volumeDown;
-
+*/
     private void Start()
     {
         _audioSource = GetComponent<AudioSource>();
         _audioSource.volume = _minVolume;
-        _volumeUp = VolumeUp();
+/*        _volumeUp = ChangeVolume();
         _volumeDown = VolumeDown();
-    }
+*/    }
 
-    private IEnumerator VolumeUp()
+    private IEnumerator ChangeVolume()
     {
         _audioSource.Play();
-        _desiredVolume = _maxVolume;
         var waitFixedUpdate = new WaitForFixedUpdate();
 
         while (_audioSource.volume != _desiredVolume)
         {
             _volume = Mathf.MoveTowards(_volume, _desiredVolume, _volumeStep * Time.deltaTime);
             _audioSource.volume = _volume;
-            yield return waitFixedUpdate;
-        }
-    }
 
-    private IEnumerator VolumeDown()
-    {
-        _desiredVolume = _minVolume;
-        var waitFixedUpdate = new WaitForFixedUpdate();
+            if (_audioSource.volume == _minVolume || _audioSource.volume == _maxVolume)
+            {
+                StopCoroutine(ChangeVolume());
+                _audioSource.priority = 22;
+            }
 
-        while (_audioSource.volume != _desiredVolume)
-        {
-            _volume = Mathf.MoveTowards(_volume, _desiredVolume, _volumeStep * Time.deltaTime);
-            _audioSource.volume = _volume;
             yield return waitFixedUpdate;
         }
     }
@@ -71,13 +64,13 @@ public class Signaling : MonoBehaviour
 
     private void IsCome()
     {
-        StopCoroutine(_volumeDown);
-        StartCoroutine(_volumeUp);
+        _desiredVolume = _maxVolume;
+        StartCoroutine(ChangeVolume());
     }
 
     private void IsGone()
     {
-        StopCoroutine(_volumeUp);
-        StartCoroutine(_volumeDown);
+        _desiredVolume = _minVolume;
+        StartCoroutine(ChangeVolume());
     }
 }
