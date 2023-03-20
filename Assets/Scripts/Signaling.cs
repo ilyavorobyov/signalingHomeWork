@@ -11,6 +11,7 @@ public class Signaling : MonoBehaviour
     private float _maxVolume = 1;
     private float _volumeStep = 0.4f;
     private EntrySensor[] _sensors;
+    private Coroutine _changeVolume;
 
     private void Start()
     {
@@ -29,12 +30,12 @@ public class Signaling : MonoBehaviour
 
             if (_audioSource.volume == _maxVolume)
             {
-                StopCoroutine(ChangeVolume());
+                StopCoroutine(_changeVolume);
             }
 
             if(_audioSource.volume == _minVolume)
             {
-                StopCoroutine(ChangeVolume());
+                StopCoroutine(_changeVolume);
                 _audioSource.Stop();
             }
 
@@ -46,13 +47,13 @@ public class Signaling : MonoBehaviour
     {
         _audioSource.Play();
         _desiredVolume = _maxVolume;
-        StartCoroutine(ChangeVolume());
+        _changeVolume = StartCoroutine(ChangeVolume());
     }
 
     private void IsGone()
     {
         _desiredVolume = _minVolume;
-        StartCoroutine(ChangeVolume());
+        _changeVolume = StartCoroutine(ChangeVolume());
     }
 
     private void OnEnable()
