@@ -43,14 +43,14 @@ public class Signaling : MonoBehaviour
         }
     }
 
-    private void IsCome()
+    private void Come()
     {
         _audioSource.Play();
         _desiredVolume = _maxVolume;
         _changeVolume = StartCoroutine(ChangeVolume());
     }
 
-    private void IsGone()
+    private void Gone()
     {
         _desiredVolume = _minVolume;
         _changeVolume = StartCoroutine(ChangeVolume());
@@ -62,8 +62,8 @@ public class Signaling : MonoBehaviour
 
         foreach (var sensor in _sensors)
         {
-            sensor.ThiefCame += IsCome;
-            sensor.ThiefGone += IsGone;
+            sensor.ThiefCame += Come;
+            sensor.ThiefGone += Gone;
         }
     }
 
@@ -71,8 +71,8 @@ public class Signaling : MonoBehaviour
     {
         foreach (var sensor in _sensors)
         {
-            sensor.ThiefCame -= IsCome;
-            sensor.ThiefGone -= IsGone;
+            sensor.ThiefCame -= Come;
+            sensor.ThiefGone -= Gone;
         }
     }
 }
