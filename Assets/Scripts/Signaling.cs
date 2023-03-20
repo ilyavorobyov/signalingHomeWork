@@ -4,13 +4,14 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class Signaling : MonoBehaviour
 {
+    [SerializeField] private EntrySensor _sensor;
+
     private AudioSource _audioSource;
     private float _volume = 0;
     private float _desiredVolume;
     private float _minVolume = 0;
     private float _maxVolume = 1;
     private float _volumeStep = 0.4f;
-    private EntrySensor[] _sensors;
     private Coroutine _changeVolume;
 
     private void Start()
@@ -33,7 +34,7 @@ public class Signaling : MonoBehaviour
                 StopCoroutine(_changeVolume);
             }
 
-            if(_audioSource.volume == _minVolume)
+            if (_audioSource.volume == _minVolume)
             {
                 StopCoroutine(_changeVolume);
                 _audioSource.Stop();
@@ -47,32 +48,36 @@ public class Signaling : MonoBehaviour
     {
         _audioSource.Play();
         _desiredVolume = _maxVolume;
+
+        if (_changeVolume != null)
+        {
+            StopCoroutine(_changeVolume);
+        }
+
         _changeVolume = StartCoroutine(ChangeVolume());
     }
 
     private void Gone()
     {
         _desiredVolume = _minVolume;
+
+        if (_changeVolume != null)
+        {
+            StopCoroutine(_changeVolume);
+        }
+
         _changeVolume = StartCoroutine(ChangeVolume());
     }
 
     private void OnEnable()
     {
-        _sensors = FindObjectsOfType<EntrySensor>();
-
-        foreach (var sensor in _sensors)
-        {
-            sensor.ThiefCame += Come;
-            sensor.ThiefGone += Gone;
-        }
+            _sensor.ThiefCame += Come;
+            _sensor.ThiefGone += Gone;
     }
 
     private void OnDisable()
     {
-        foreach (var sensor in _sensors)
-        {
-            sensor.ThiefCame -= Come;
-            sensor.ThiefGone -= Gone;
-        }
+            _sensor.ThiefCame -= Come;
+            _sensor.ThiefGone -= Gone;
     }
 }
